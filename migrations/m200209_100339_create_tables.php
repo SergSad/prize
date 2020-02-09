@@ -9,6 +9,9 @@ class m200209_100339_create_tables extends Migration {
 	/**
 	 * {@inheritdoc}
 	 */
+	/**
+	 * {@inheritdoc}
+	 */
 	public function safeUp() {
 
 		$tableOptions = null;
@@ -36,7 +39,8 @@ class m200209_100339_create_tables extends Migration {
 		$this->createTable('{{%user_prizes}}', [
 			'id'         => $this->primaryKey(),
 			'user_id'    => $this->integer()->notNull(),
-			'prize_type' => $this->string()->notNull()
+			'prize_type' => $this->string()->notNull(),
+			'is_send'    => $this->boolean()->notNull()->defaultValue(false)
 		]);
 
 		$this->addForeignKey('fk-user_prizes[user]', 'user_prizes', 'user_id', 'user', 'id', 'restrict', 'restrict');
@@ -45,7 +49,8 @@ class m200209_100339_create_tables extends Migration {
 		/** Список физических продуктов */
 		$this->createTable('product', [
 			'id'   => $this->primaryKey(),
-			'name' => $this->string()->notNull()
+			'name' => $this->string()->notNull(),
+			'exist' => $this->boolean()->defaultValue(true),
 		]);
 
 		$this->batchInsert('product', ['name'], static::PRODUCTS);
@@ -80,6 +85,14 @@ class m200209_100339_create_tables extends Migration {
 		$this->addForeignKey('fk-prize_money[user_prize]', 'prize_money', 'user_prize_id', 'user_prizes', 'id', 'restrict', 'restrict');
 		/** -- -- -- */
 
+		/** Настройки */
+		$this->createTable('{{%settings}}', [
+			'id'    => $this->primaryKey(),
+			'name'  => $this->string()->notNull(),
+			'value' => $this->string()->notNull(),
+		]);
+		$this->batchInsert('{{%settings}}', ['name', 'value'], static::SETTINGS);
+		/** -- -- -- */
 	}
 
 	/** Записи, которые будут добавлены в таблицу. */
@@ -94,6 +107,17 @@ class m200209_100339_create_tables extends Migration {
 		['Макароны'],
 	];
 
+
+	/** Записи, которые будут добавлены в таблицу. */
+	private const SETTINGS = [
+		['bonus_min','0'],
+		['bonus_max','500'],
+		['money_min','0'],
+		['money_max','300'],
+		['money','1000'],
+		['coefficient','2'],
+	];
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -104,5 +128,6 @@ class m200209_100339_create_tables extends Migration {
 		$this->dropTable('{{%product}}');
 		$this->dropTable('{{%user_prizes}}');
 		$this->dropTable('{{%user}}');
+		$this->dropTable('{{%settings}}');
 	}
 }

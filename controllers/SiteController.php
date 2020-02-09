@@ -2,7 +2,14 @@
 
 namespace app\controllers;
 
+use app\models\PrizeBonus;
+use app\models\PrizeMoney;
+use app\models\PrizePhysical;
+use app\models\Prizes;
 use app\models\SignupForm;
+use app\modules\prize\creators\BonusPrizeCreator;
+use app\modules\prize\creators\MoneyPrizeCreator;
+use app\modules\prize\creators\PhysicalPrizeCreator;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -154,7 +161,34 @@ class SiteController extends Controller
 	 * @author Sergey Sadovin <sadovin.serj@gmail.com>
 	 */
 	public function actionGenerate() {
+		if (Yii::$app->user->isGuest) {
+			return $this->goHome();
+		}
 
+		$types = Prizes::getAvailablePrizesType();
+		$type  = $types[rand(0, count($types) - 1)];
+
+		$prize = null;
+
+		switch ($type) {
+			case PrizePhysical::TYPE:
+				$prize = new PhysicalPrizeCreator();
+				break;
+			case PrizeMoney::TYPE:
+				$prize = new MoneyPrizeCreator();
+				break;
+			case PrizeBonus::TYPE:
+				$prize = new BonusPrizeCreator();
+				break;
+		}
+
+		if (null === $prize) {
+			return $this->goHome();
+		}
+
+		$prize->generatePrize();
+
+		return $this->goHome();
 	}
 
 }

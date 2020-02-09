@@ -154,7 +154,7 @@ class User extends ActiveRecord implements IdentityInterface {
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getUserPrizes() {
-		return $this->hasMany(UserPrizes::className(), ['user_id' => 'id']);
+		return $this->hasOne(UserPrizes::className(), ['user_id' => 'id']);
 	}
 
 }
