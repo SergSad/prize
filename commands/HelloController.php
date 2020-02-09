@@ -1,12 +1,15 @@
 <?php
 /**
- * @link http://www.yiiframework.com/
+ * @link      http://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license   http://www.yiiframework.com/license/
  */
 
 namespace app\commands;
 
+use app\models\PrizeMoney;
+use app\models\UserPrizes;
+use app\modules\services\MoneyPrizeService;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -16,19 +19,29 @@ use yii\console\ExitCode;
  * This command is provided as an example for you to learn how to create console commands.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
+ * @since  2.0
  */
-class HelloController extends Controller
-{
-    /**
-     * This command echoes what you have entered as the message.
-     * @param string $message the message to be echoed.
-     * @return int Exit code
-     */
-    public function actionIndex($message = 'hello world')
-    {
-        echo $message . "\n";
+class HelloController extends Controller {
 
-        return ExitCode::OK;
-    }
+	/**
+	 * Отправлять денежные призы на счета пользователей, которые еще не были отправлены пачками по N штук.
+	 *
+	 * @param string $n
+	 *
+	 * @return int
+	 * @throws \yii\db\Exception
+	 *
+	 * @author Sergey Sadovin <sadovin.serj@gmail.com>
+	 */
+	public function actionIndex($n = '10') {
+		/** @var UserPrizes $prize */
+		foreach (UserPrizes::find()->where([
+			UserPrizes::ATTR_PRIZE_TYPE => PrizeMoney::TYPE,
+			UserPrizes::ATTR_IS_SEND    => false
+		])->each($n) as $prize) {
+			MoneyPrizeService::sendMoneyToBank($prize->user_id);
+		}
+
+		return ExitCode::OK;
+	}
 }
