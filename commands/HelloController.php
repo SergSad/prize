@@ -33,7 +33,7 @@ class HelloController extends Controller {
 	 *
 	 * @author Sergey Sadovin <sadovin.serj@gmail.com>
 	 */
-	public function actionIndex($n = '10') {
+	public function actionSendMoneyToBank($n = '10') {
 		/** @var UserPrizes $prize */
 		foreach (UserPrizes::find()->where([
 			UserPrizes::ATTR_PRIZE_TYPE => PrizeMoney::TYPE,

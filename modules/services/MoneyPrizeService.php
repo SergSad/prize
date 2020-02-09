@@ -48,7 +48,7 @@ class MoneyPrizeService {
 			/** @var User $userModel */
 			$userModel = Yii::$app->user->identity;
 			$userPrize = $userModel->userPrizes;
-			$prize     = $userPrize->getPrize();
+			$prize     = $userPrize->prize;
 
 			if ($prize instanceof PrizeMoney) {
 				$userModel->accounts_points = $prize->value * (int)Settings::get(Settings::ATTR_COEFFICIENT);
